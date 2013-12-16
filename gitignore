@@ -34,8 +34,9 @@ syntax: glob
 ######################
 .DS_Store*
 ehthumbs.db
-Icon?
+#Icon?
 Thumbs.db
+.idea
 
 # Vim swap files
 *.sw[po]

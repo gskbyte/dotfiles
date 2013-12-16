@@ -1,116 +1,206 @@
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"   Filename: .vimrc                                                         "
-" Maintainer: Michael J. Smalley <michaeljsmalley@gmail.com>                 "
-"        URL: http://github.com/michaeljsmalley/dotfiles                     "
-"                                                                            "
-"                                                                            "
-" Sections:                                                                  "
-"   01. General ................. General Vim behavior                       "
-"   02. Events .................. General autocmd events                     "
-"   03. Theme/Colors ............ Colors, fonts, etc.                        "
-"   04. Vim UI .................. User interface behavior                    "
-"   05. Text Formatting/Layout .. Text, tab, indentation related             "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-call pathogen#runtime_append_all_bundles()
+filetype off
+call pathogen#incubate()
 call pathogen#helptags()
+filetype plugin indent on
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 01. General                                                                "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set nocompatible          " get rid of Vi compatibility mode. SET FIRST!
-set backup                " keep a backup file
-set backupdir=~/.vim/backups
-set history=100           " keep 50 lines of command line history
+set nocompatible
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 02. Events                                                                 "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-filetype plugin indent on " filetype detection[ON] plugin[ON] indent[ON]
+" Tabs/spaces
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set expandtab
 
-" In Makefiles DO NOT use spaces instead of tabs
-autocmd FileType make setlocal noexpandtab
-" In Ruby files, use 2 spaces instead of 4 for tabs
-autocmd FileType ruby setlocal sw=2 ts=2 sts=2
+" Basic options
+set encoding=utf-8
+set scrolloff=5
+set autoindent
+set showmode
+set showcmd
+set hidden
+set wildmenu
+set wildmode=list:longest
+set completeopt=longest,menu
+set visualbell
+set cursorline
+set ruler
+set backspace=indent,eol,start
+set laststatus=2
+set number
 
-"autocmd Filetype htmldjango source ~/.vim/bundle/vim-sparkup/ftplugin/html/sparkup.vim
+" Backup stuff
+set nobackup
+set nowritebackup
+set noswapfile
 
-" augroup sparkup_types
-"   autocmd! " Remove ALL autocommands for the current group.
-"   autocmd FileType mustache,php,htmldjango runtime!  ftplugin/html/sparkup.vim
-" augroup END
- 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 03. Theme/Colors                                                           "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set t_Co=256              " enable 256-color mode.
-syntax enable             " enable syntax highlighting (previously syntax on).
-colorscheme molokai       " set colorscheme
+"folding settings
+set foldmethod=indent   "fold based on indent
+set foldnestmax=10      "deepest fold is 10 levels
+set nofoldenable        "dont fold by default
+set foldlevel=1         "this is just what i use
 
-" Prettify JSON files
-autocmd BufRead,BufNewFile *.json set filetype=json
-autocmd Syntax json sou ~/.vim/syntax/json.vim
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 04. Vim UI                                                                 "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set number                " show line numbers
-set laststatus=2          " last window always has a statusline
-filetype indent on        " activates indenting for files
-"set nohlsearch            " Don't continue to highlight searched phrases.
-set incsearch             " But do highlight as you type your search.
-set ignorecase            " Make searches case-insensitive.
-set ruler                 " Always show info along bottom.
-set cursorline            " Highlight current line
-set go-=T                 " Hide MacVim toolbar by default
-set gfn=Monaco:h10        " Set font to monaco
+if has("autocmd")
+  " Set File type to 'text' for files ending in .txt
+  autocmd BufNewFile,BufRead *.txt setfiletype text
+
+  " Enable soft-wrapping for text files
+  autocmd FileType text,markdown,html,xhtml,eruby setlocal wrap linebreak nolist
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+
+  " Automatically load .vimrc source when saved
+  autocmd BufWritePost .vimrc source $MYVIMRC
+
+  augroup END
+else
+  set autoindent		" always set autoindenting on
+endif " has("autocmd")
+
+
+
+map Q gq
+
+" Leader
+let mapleader = ","
+
+" Searching
+nnoremap / /\v
+vnoremap / /\v
+set ignorecase
+set smartcase
+set incsearch
 set showmatch
-"set statusline=%<%f\%h%m%r%=%-20.(line=%l\ \ col=%c%V\ \ totlin=%L%)\ \ \%h%m%r%=%-40(bytval=0x%B,%n%Y%)\%P
-if has('statusline')
-    set laststatus=2
-    " Broken down into easily includeable segments
-    set statusline=%<%f\   " Filename
-    set statusline+=%w%h%m%r " Options
-    "set statusline+=%{fugitive#statusline()} "  Git Hotness
-    set statusline+=\ [%{&ff}/%Y]            " filetype
-    set statusline+=\ [%{getcwd()}]          " current dir
-    "set statusline+=\ [A=\%03.3b/H=\%02.2B] " ASCII / Hexadecimal value of char
-    set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
+set hlsearch
+set gdefault
+map <leader><space> :noh<cr>
+
+" Soft/hard wrapping
+set nowrap
+
+" Use the same symbols as TextMate for tabstops and EOLs
+" set list
+" set listchars=tab:▸\ ,eol:¬
+
+" Color scheme (terminal)
+syntax on
+
+let g:fuf_splitPathMatching=1
+
+" Use the damn hjkl keys
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+
+" And make them fucking work, too.
+nnoremap j gj
+nnoremap k gk
+
+" Easy buffer navigation
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+map <leader>v <C-w>v<C-w>l
+map <leader>h <C-w>s
+
+" NERDTree trigger
+nnoremap <leader>n :NERDTreeToggle<CR>
+
+
+" Clean whitespace
+map <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
+
+" Ack
+map <leader>a :Ack
+
+" Yankring
+nnoremap <silent> <F3> :YRShow<cr>
+nnoremap <silent> <leader>y :YRShow<cr>
+
+" Faster Esc
+inoremap jj <ESC>
+
+" Edit .vimrc
+nmap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
+
+" Sudo to write
+cmap w!! w !sudo tee % >/dev/null
+
+" Move lines up and down
+map <C-DOWN> :m +1 <CR>
+map <C-UP> :m -2 <CR>
+
+" complete line
+imap <C-L> <C-X><C-L>
+
+" switching tabs
+noremap <c-tab> :tabnext<cr>
+
+" RagTag Mappings
+"</<C-X><C-O>
+imap <leader>. <C-X>/
+imap <leader>, <C-X>-
+imap <leader>m <C-X>=
+
+" Rails commands
+map <Leader>rm :Rmodel
+map <Leader>rc :Rcontroller
+map <Leader>rv :Rview
+
+" fuzzy file finder
+nnoremap <leader>p :<C-u>FufFile **/<CR>
+nnoremap <leader>fb :<C-u>FufBuffer **/<CR>
+
+colorscheme railscasts
+set t_Co=256
+
+if has('gui_running')
+  colorscheme solarized
+  set background=light
+
+  " colorscheme railscasts
+  set guifont=Inconsolata:h13
+  set guifont=Monaco:h11
+  let g:airline_powerline_fonts = 1
+  set guifont=Sauce\ Code\ Powerline:h11
+
+  set go-=T
+  set go-=l
+  set go-=L
+  set go-=r
+  set go-=R
+
+  " Set up the gui cursor to look nice
+  set guicursor=n-v-c:block-Cursor-blinkon0
+  set guicursor+=ve:ver35-Cursor
+  set guicursor+=o:hor50-Cursor
+  set guicursor+=i-ci:ver25-Cursor
+  set guicursor+=r-cr:hor20-Cursor
+  set guicursor+=sm:block-Cursor-blinkwait175-blinkoff150-blinkon17
+
+  if has("gui_macvim")
+      set macmeta
+      macmenu &File.New\ Tab key=<nop>
+  end
+
+  highlight SpellBad term=underline gui=undercurl guisp=Orange
 endif
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 05. Text Formatting/Layout                                                 "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set autoindent            " auto-indent
-set smartindent           " smart-indent
-set tabstop=4             " tab spacing
-set softtabstop=4         " unify
-set shiftwidth=4          " indent/outdent by 4 columns
-set shiftround            " always indent/outdent to the nearest tabstop
-set expandtab             " use spaces instead of tabs
-set smarttab              " use tabs at the start of a line, spaces elsewhere
-set nowrap                " don't wrap text
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 06. Completion                                                             "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" :set wildmenu enables a menu at the bottom of the vim/gvim window.
-set wildmenu
-" list:longest - When > 1 match, list all matches and
-" complete till longest common string.
-" full - enables you to tab through the remaining completions
-set wildmode=list:longest,full
-"set completeopt=menuone,preview      " My old mode
+autocmd BufNewFile,BufRead *_spec.rb  compiler rspec
+au! BufRead,BufNewFile *.sass         setfiletype sass
+au! BufRead,BufNewFile *.jst          setfiletype html
+au! BufNewFile,BufRead *.prawn        setfiletype ruby
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 07. Key Mappings                                                           "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Pane movement
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-let mapleader = ','       " set mapleader in , key
-
-nnoremap <leader><space> :noh<cr>
